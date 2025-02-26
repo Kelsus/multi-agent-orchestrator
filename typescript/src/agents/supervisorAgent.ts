@@ -175,6 +175,7 @@ ${this.leadAgentGuidelines}
 </agents_memory>
 `;
 
+    Logger.logger.info(`\n> Lead Agent Prompt: ${this.promptTemplate}`);
     this.leadAgent.setSystemPrompt(this.promptTemplate);
   }
 
