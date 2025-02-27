@@ -28,7 +28,7 @@ export interface OpenAIAgentOptions extends AgentOptions {
     variables?: TemplateVariables;
   };
   retriever?: Retriever;
-
+  formatResponseAsJson?: boolean;
 }
 
 export type OpenAIAgentOptionsWithAuth = OpenAIAgentOptions & (WithApiKey | WithClient);
@@ -49,6 +49,7 @@ export class OpenAIAgent extends Agent {
   private systemPrompt: string;
   private customVariables: TemplateVariables;
   protected retriever?: Retriever;
+  private formatResponseAsJson?: boolean;
 
 
   constructor(options: OpenAIAgentOptionsWithAuth) {
@@ -63,6 +64,10 @@ export class OpenAIAgent extends Agent {
     } else {
       if (!options.apiKey) throw new Error("OpenAI API key is required");
       this.client = new OpenAI({ apiKey: options.apiKey });
+    }
+
+    if (options.formatResponseAsJson) {
+      this.formatResponseAsJson = options.formatResponseAsJson;
     }
 
     this.model = options.model ?? OPENAI_MODEL_ID_GPT_O_MINI;
@@ -148,8 +153,8 @@ export class OpenAIAgent extends Agent {
       temperature,
       top_p: topP,
       stop: stopSequences,
+      response_format: {type: this.formatResponseAsJson ? 'json_object' : 'text'}
     };
-
 
 
     if (this.streaming) {
